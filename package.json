@@ -1,6 +1,6 @@
 {
   "name": "@onkernel/ai-sdk",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Vercel AI SDK-compatible tools for Onkernel Kernel SDK (Playwright execution).",
   "keywords": [
     "vercel",
@@ -29,7 +29,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
+      "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     }
   },
