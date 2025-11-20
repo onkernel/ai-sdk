@@ -2,7 +2,16 @@
   "name": "@onkernel/ai-sdk",
   "version": "0.1.0",
   "description": "Vercel AI SDK-compatible tools for Onkernel Kernel SDK (Playwright execution).",
-  "keywords": ["vercel", "ai", "sdk", "tools", "onkernel", "playwright", "browser", "agents"],
+  "keywords": [
+    "vercel",
+    "ai",
+    "sdk",
+    "tools",
+    "onkernel",
+    "playwright",
+    "browser",
+    "agents"
+  ],
   "license": "MIT",
   "author": "Onkernel",
   "repository": {
@@ -25,7 +34,9 @@
     }
   },
   "sideEffects": false,
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "clean": "rm -rf dist",
@@ -33,15 +44,19 @@
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
-    "ai": "*",
-    "@onkernel/sdk": "*"
+    "@onkernel/sdk": "*",
+    "ai": "^5"
   },
   "devDependencies": {
-    "typescript": "^5.6.0",
-    "tsup": "^8.0.0",
-    "ai": "^4.0.0"
+    "@ai-sdk/openai": "latest",
+    "@onkernel/sdk": "latest",
+    "@types/node": "^24.10.1",
+    "ai": "^5",
+    "tsup": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
   },
   "dependencies": {
-    "zod": "^3.23.8"
+    "zod": "^4.1.12"
   }
 }

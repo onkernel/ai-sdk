@@ -1,1 +1,1 @@
-export { createKernelPlaywrightTools } from "./playwright";
+export { playwrightExecuteTool } from "./playwright";

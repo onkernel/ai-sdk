@@ -1,13 +1,13 @@
 # @onkernel/ai-sdk
 
-Vercel AI SDK-compatible tools for the Onkernel Kernel SDK. This package exposes a Playwright execution tool wired to an existing Kernel browser session, so LLMs can browse and act via structured tools.
+Vercel AI SDK-compatible tools for the [Kernel](https://docs.onkernel.com) SDK. This package exposes a Playwright execution tool wired to an existing Kernel browser session, so LLMs can browse and act via structured tools.
 
 ## Install
 
 ```bash
 npm install @onkernel/ai-sdk zod
-# Ensure your app depends on the Vercel AI SDK
-npm install ai
+# Ensure your app depends on the Vercel AI SDK and @onkernel/sdk
+npm install ai @onkernel/sdk
 ```
 
 > Note: `@onkernel/sdk` is a peer dependency; install it in your application.
@@ -15,63 +15,72 @@ npm install ai
 ## Usage
 
 ```ts
-import { createKernelPlaywrightTools } from '@onkernel/ai-sdk';
-import { createClient } from '@onkernel/sdk';
-import { generateText } from 'ai';
+import { playwrightExecuteTool } from "@onkernel/ai-sdk";
+import Kernel from "@onkernel/sdk";
+import { generateText } from "ai";
 
 // 1) Create Kernel client and start a browser session
-const client = createClient({ apiKey: process.env.KERNEL_API_KEY! });
-const { id: sessionId } = await client.browsers.start({ browser: 'chromium' });
+const client = new Kernel({
+  apiKey: process.env["KERNEL_API_KEY"], // optional, default env lookup
+});
+const browser = await client.browsers.create({ browser: "chromium" });
+const sessionId = browser.session_id;
+console.log(sessionId);
 
-// 2) Create tools for the AI SDK
-const tools = createKernelPlaywrightTools({ client, sessionId });
+// 2) Create the Playwright execution tool
+const playwrightTool = playwrightExecuteTool({ client, sessionId });
 
 // 3) Use with Vercel AI SDK
+const model = ...; // your AI model instance
+
 const result = await generateText({
-  model, // your model
-  prompt: 'Open example.com and click the first link',
-  tools,
+  model,
+  prompt: "Open example.com and click the first link",
+  tools: {
+    playwright_execute: playwrightTool,
+  },
 });
 ```
 
 ### Tool shape
 
-The exported registry contains a single tool named `playwright_execute` by default. You can customize the name with the `toolName` option.
-
-Parameters schema (Zod):
+`playwrightExecuteTool` returns a single Vercel AI SDK tool instance.
+The tool's input mirrors `PlaywrightExecuteParams` from the Kernel SDK:
 
 ```ts
 {
-  steps: Array<{
-    action: 'goto' | 'click' | 'fill' | 'type' | 'press' | 'waitForSelector' |
-            'waitForTimeout' | 'screenshot' | 'evaluate' | 'hover' | 'check' |
-            'uncheck' | 'selectOption';
-    selector?: string;
-    text?: string;
-    url?: string;
-    value?: unknown;
-    options?: Record<string, unknown>;
-    script?: string; // for evaluate
-  }>,
-  returnHtml?: boolean,
-  screenshot?: 'none' | 'viewport' | 'full',
-  timeoutMs?: number,
-  metadata?: Record<string, unknown>,
+  code: string;        // required JavaScript/TypeScript snippet
+  timeout_sec?: number; // optional execution timeout in seconds (default 60)
 }
 ```
 
-The tool uses the Kernel SDK Playwright resource under `client.browsers.playwright` and calls its `execute` (or `run`) method with `{ sessionId, ... }`.
+Under the hood we call `client.browsers.playwright.execute(sessionId, { code, timeout_sec })`, so any code you can run through the SDK can be run via the tool.
 
 ## API
 
 ```ts
-function createKernelPlaywrightTools(options: {
-  client: any;         // Kernel SDK client instance (@onkernel/sdk)
-  sessionId: string;   // Existing browser session id
-  toolName?: string;   // Optional custom tool name, default 'playwright_execute'
-}): { [toolName: string]: ReturnType<typeof tool> }
+function playwrightExecuteTool(options: {
+  client: Kernel; // Kernel SDK client instance (@onkernel/sdk)
+  sessionId: string; // Existing browser session id
+}): ReturnType<typeof tool>;
 ```
+
+## Examples
+
+Run the sample script in `examples/basic.ts` after exporting both `KERNEL_API_KEY`
+and a model provider key (the example uses OpenAI):
+
+```bash
+export KERNEL_API_KEY=...
+export OPENAI_API_KEY=...
+pnpm exec tsx examples/basic.ts
+```
+
+The script mirrors the usage above: it starts a browser session, registers the
+`playwright_execute` tool, calls `generateText` from the Vercel AI SDK (forcing the
+model to invoke the tool), logs the model response/tool results, and then cleans up
+the browser session.
 
 ## License
 
-MIT © Onkernel
+MIT © Kernel
