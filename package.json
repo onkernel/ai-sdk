@@ -1,0 +1,62 @@
+{
+  "name": "@onkernel/ai-sdk",
+  "version": "0.1.0",
+  "description": "Vercel AI SDK-compatible tools for Onkernel Kernel SDK (Playwright execution).",
+  "keywords": [
+    "vercel",
+    "ai",
+    "sdk",
+    "tools",
+    "onkernel",
+    "playwright",
+    "browser",
+    "agents"
+  ],
+  "license": "MIT",
+  "author": "Onkernel",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onkernel/ai-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/onkernel/ai-sdk/issues"
+  },
+  "homepage": "https://github.com/onkernel/ai-sdk#readme",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "@onkernel/sdk": "*",
+    "ai": "^5"
+  },
+  "devDependencies": {
+    "@ai-sdk/openai": "latest",
+    "@onkernel/sdk": "latest",
+    "@types/node": "^24.10.1",
+    "ai": "^5",
+    "tsup": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
+  },
+  "dependencies": {
+    "zod": "^4.1.12"
+  }
+}
